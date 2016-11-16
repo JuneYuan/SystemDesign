@@ -6,42 +6,8 @@ import java.util.List;
 import org.junit.Test;
 
 // 所谓 brute 是指，寻找被分割区间时采用的是遍历所有区间的方法
+// Run Time: 9527 ms
 public class ConsistentHashing_brute {
-	private class Machine implements Comparable<Machine> {
-		int id;						// 1, 2, 3, ...
-		int leftBound, rightBound;  // this machine occupies interval [leftBound, rightBound]
-		int span;					// interval length
-		
-		public Machine(int leftBound, int rightBound, int id) {
-			this.leftBound = leftBound;
-			this.rightBound = rightBound;
-			this.id = id;
-			this.span = rightBound - leftBound + 1;
-		}
-
-		public List<Integer> toList() {
-			List<Integer> result = new ArrayList<>();
-			result.add(leftBound);
-			result.add(rightBound);
-			result.add(id);
-			
-			return result;
-		}
-		
-		@Override
-		public int compareTo(Machine that) {
-			if (this.span < that.span)  return -1;
-			if (this.span > that.span)  return 1;
-			if (this.id > that.id)  return -1;
-			if (this.id < that.id)  return 1;
-			return 0;
-		}
-	
-		@Override
-		public String toString() {
-			return String.format("(%d, %d, %d)", leftBound, rightBound, id);
-		}
-	}
 	
 	public List<List<Integer>> consistentHashing(int n) {
 		List<Machine> machines = solve(n);
@@ -92,3 +58,40 @@ public class ConsistentHashing_brute {
     }
 
 }
+
+class Machine implements Comparable<Machine> {
+	int id;						// 1, 2, 3, ...
+	int leftBound, rightBound;  // this machine occupies interval [leftBound, rightBound]
+	int span;					// interval length
+	
+	public Machine(int leftBound, int rightBound, int id) {
+		this.leftBound = leftBound;
+		this.rightBound = rightBound;
+		this.id = id;
+		this.span = rightBound - leftBound + 1;
+	}
+
+	public List<Integer> toList() {
+		List<Integer> result = new ArrayList<>();
+		result.add(leftBound);
+		result.add(rightBound);
+		result.add(id);
+		
+		return result;
+	}
+	
+	@Override
+	public int compareTo(Machine that) {
+		if (this.span < that.span)  return -1;
+		if (this.span > that.span)  return 1;
+		if (this.id > that.id)  return -1;
+		if (this.id < that.id)  return 1;
+		return 0;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("(%d, %d, %d)", leftBound, rightBound, id);
+	}
+}
+

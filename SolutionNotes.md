@@ -1,5 +1,24 @@
 # Solution Notes
 
+### P502 Mini Cassandra
+
+首先这里肯定需要保存数据库一张表的信息。 NoSQL 数据库的表一般是这个样子：
+
+![](http://ww4.sinaimg.cn/mw690/6b9392ddgw1fa2cz1058jj20ti03twfd.jpg)
+
+直接根据这个图，去构造一个 `MiniCassandra` 类的字段的话，应该是怎样呢？首先能想到的就是一个 `List` ，逐行存放每一条记录（这不是 SQL 里面的表么？所以呢， SQL 数据库的最根本数据结构是个什么呢？待考证……）。这时，我们又需要用一个内部类来表示“每一条记录”，它的设计大体是这样的：
+
+```
+class Record {
+	String rowKey;
+	TreeMap<Integer, String> cells;  // Integer 代表 columnKey, String 代表 columnValue
+}
+```
+
+为什么没有看到图中 `row1` 对应的字段呢？这是因为 row1 所包含的信息，作为 `List<Record>` 中元素的下表索引就好了，不必显式地用一个字段去存储。实际要插入一条记录时，首先计算出来 `rowKey` 的 hash 散列值，作为这条记录要插入的位置下标，然后构造一条记录插入 `List<Record>` 即可。
+
+但是这样有个问题：`hash(rowKey)` 得到的散列值理论上是随机的，所以 `List<Record>` 也就应该被初始化为一个非常大的容量，然而我们不太可能这么去做。结论呢？——就是舍弃 `List` 的数据结构，采用 `HashMap<Integer, TreeMap<Integer, String>>`, 其中外层的 `HashMap` 表示一个 `rowKey` 到它后边同一行的所有单元格（每个单元格其实就是一个 `columnKey - columnValue pair` ）所组成的整体的映射关系；而内层的 `TreeMap` 则表示了一个 `columnKey` 到一个 `columnValue` 的映射关系。这样确实是可以的。
+
 ### P519 Consistent Hashing
 
 问题：求从一台机器加到n台后，区间分布和对应的机器编号？（`每个区间内的值代表了数据模n以后的结果，每个区间对应着一个机器，机器负责……区间到底代表什么？？？`题目没有明说，从运行效果来看，返回结果是不必按区间先后有序的）

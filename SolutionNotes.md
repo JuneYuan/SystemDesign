@@ -73,6 +73,8 @@ class Record {
 }
 ```
 
+### P520 Consistent HashingII
+
 ### P538 Memcache
 
 由题意，很显然是要用 HashMap 的。问题在于，怎么把 time 这个信息给结合进来。一个办法就是：把有效时间区间和原来的 value 一起，作为新的 value （也就是搞一个 Wrapper）, 那么 API 中的每一个操作，就都是在操作这个 Wrapper 了。

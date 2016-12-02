@@ -1,5 +1,11 @@
 package crawler_typeahead;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
 public class TrieService {
 
     private TrieNode root = null;
@@ -21,9 +27,9 @@ public class TrieService {
         TrieNode curr = root;
         int n = word.length();
         for (int i = 0; i < n; i++) {
-            Character ch = word.charAt(i);
+            char ch = word.charAt(i);
             if (!curr.children.containsKey(ch)) {
-                curr.children.put(c, new TrieNode());
+                curr.children.put(ch, new TrieNode());
             }
             curr = curr.children.get(ch);
             addFrequency(curr.top10, frequency);
@@ -32,22 +38,19 @@ public class TrieService {
     
     private void addFrequency(List<Integer> top10, int frequency) {
         top10.add(frequency);
-        int n = top10.size();
-        int index = n - 1;
-        while (index > 0) {
-            if (top10.get(index) > top10.get(index - 1)) {
-                int tmp1 = top10.get(index);
-                int tmp2 = top10.get(index - 1);
-                top10.set(index, tmp2);
-                top10.set(index, tmp1);
-                index -= 1;
-            } else {
-                break;
-            }
-        }
-        
-        if (n > 10) {
-            top10.remove(n - 1);
+        Collections.sort(top10, Collections.reverseOrder());
+        if (top10.size() > 10) {
+            top10.remove(top10.size() - 1);
         }
     }
  }
+
+class TrieNode {
+	public NavigableMap<Character, TrieNode> children;
+	public List<Integer> top10;
+	
+	public TrieNode() {
+		children = new TreeMap<Character, TrieNode>();
+		top10 = new ArrayList<Integer>();
+	}
+}

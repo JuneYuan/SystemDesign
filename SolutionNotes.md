@@ -1,5 +1,37 @@
 # Solution Notes
 
+### P442 Implement Trie
+
+> 
+Implement a trie with insert(), search(), and startsWith() methods. The API is as follows:
+```
+	public class Trie {
+		public void insert(String word)
+		public boolean search(String word)
+		public boolean startsWith(String prefix)
+	}
+```
+
+#### 思路
+
+根据题目要求，分析清楚 `TrieNode` 应该提供的属性和方法就可以了——
+
+``` 
+	private class TrieNode {
+		char value;  // 节点数据（即所代表的字母）
+		boolean isEndOfWord;  // 是否一个单词的结尾
+		HashMap<Character, TrieNode> char2child;  // 存储节点的孩子信息，使用 Map 的理由见 P559
+		//
+		public boolean hasChildOfChar(char ch)
+		public TrieNode getChildOfChar(char ch)
+		public void addChildOfChar(char ch)
+	}
+```
+
+### P500 Inverted Index
+
+倒排索引，就是键值对颠倒了，返回一个新的 HashMap.
+
 ### P502 Mini Cassandra
 
 首先这里肯定需要保存数据库一张表的信息。 NoSQL 数据库的表一般是这个样子：
@@ -78,3 +110,41 @@ class Record {
 ### P538 Memcache
 
 由题意，很显然是要用 HashMap 的。问题在于，怎么把 time 这个信息给结合进来。一个办法就是：把有效时间区间和原来的 value 一起，作为新的 value （也就是搞一个 Wrapper）, 那么 API 中的每一个操作，就都是在操作这个 Wrapper 了。
+
+### P559 Trie Service
+
+> 
+Build tries from a list of pairs, and each of the pairs is composed of `String word` and `int frequency`, denoting that `word` has occurred `frequency` times. Save top 10 greatest `frequency` value for each node. The TrieNode is defined as follows:
+
+> 
+```
+class TrieNode {
+	public NavigableMap<Character, TrieNode> children;
+	public List<Integer> top10;
+	//
+	public TrieNode() {
+		children = new TreeMap<Character, TrieNode>();
+		top10 = new ArrayList<Integer>();
+	}
+}
+```
+
+#### 思路
+
+先理解清楚题意，剩下就比较好做了。
+
++ 首先这里定义 `TrieNode` 结点的方式与通常见到的二叉树不太一样。二叉树结点定义通常是：
+```
+class TreeNode {
+	private int val;
+	private TreeNode left, right;
+	//
+	public TreeNode(int val) {...}
+}
+```
+
+其中孩子结点也是 `TreeNode` 类型的，这是因为二叉树只有两个孩子，定义结构体时可以直接列举出来。而字典树则不同，每个节点的孩子个数是不确定的，所以要把孩子们放在一个容器里，又由于字典树的每个孩子结点对应着一个字母，所以就用 `Map<char, TrieNode>` 来存储孩子们。
+
+`TrieNode` 的另一个字段， `List<Integer> top10`, 表示的是：以*从 root 到 this 所组成的字符串*为前缀的那些单词当中，出现次数排前十的频率值。稍微有点绕，但弄明白意思，剩下就好写了。
+
++ （写题时 get 到的新技能）怎样利用库函数提供的排序方法实现从大到小排序，有无内置的与默认从小到大顺序相反的比较器？——有的，这里调用 `Collections.sort(top10, Collections.reverseOrder())` 就可以了。
